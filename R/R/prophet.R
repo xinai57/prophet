@@ -1025,20 +1025,36 @@ predict.prophet <- function(object, df = NULL, ...) {
 
   df$trend <- predict_trend(object, df)
   seasonal.components <- predict_seasonal_components(object, df)
-  intervals <- predict_uncertainty(object, df)
-
-  # Drop columns except ds, cap, floor, and trend
-  cols <- c('ds', 'trend')
-  if ('cap' %in% colnames(df)) {
-    cols <- c(cols, 'cap')
+  if (m$uncertainty.samples > 0){
+    intervals <- predict_uncertainty(object, df)
+    # Drop columns except ds, cap, floor, and trend
+    cols <- c('ds', 'trend')
+    if ('cap' %in% colnames(df)) {
+      cols <- c(cols, 'cap')
+    }
+    if (object$logistic.floor) {
+      cols <- c(cols, 'floor')
+    }
+    df <- df[cols]
+    if (m$uncertainty.samples > 0){}
+    df <- df %>%
+      dplyr::bind_cols(seasonal.components) %>%
+      dplyr::bind_cols(intervals)
+  }else{
+    # Drop columns except ds, cap, floor, and trend
+    cols <- c('ds', 'trend')
+    if ('cap' %in% colnames(df)) {
+      cols <- c(cols, 'cap')
+    }
+    if (object$logistic.floor) {
+      cols <- c(cols, 'floor')
+    }
+    df <- df[cols]
+    if (m$uncertainty.samples > 0){}
+    df <- df %>%
+      dplyr::bind_cols(seasonal.components)
   }
-  if (object$logistic.floor) {
-    cols <- c(cols, 'floor')
-  }
-  df <- df[cols]
-  df <- df %>%
-    dplyr::bind_cols(seasonal.components) %>%
-    dplyr::bind_cols(intervals)
+  
   df$yhat <- df$trend + df$seasonal
   return(df)
 }
