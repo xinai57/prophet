@@ -1025,22 +1025,31 @@ predict.prophet <- function(object, df = NULL, ...) {
 
   df$trend <- predict_trend(object, df)
   seasonal.components <- predict_seasonal_components(object, df)
-  # Drop columns except ds, cap, floor, and trend
-  cols <- c('ds', 'trend')
-  if ('cap' %in% colnames(df)) {
-    cols <- c(cols, 'cap')
-  }
-  if (object$logistic.floor) {
-    cols <- c(cols, 'floor')
-  }
-  df <- df[cols]
-  
   if (object$uncertainty.samples > 0){
     intervals <- predict_uncertainty(object, df)
+
+    # Drop columns except ds, cap, floor, and trend
+    cols <- c('ds', 'trend')
+    if ('cap' %in% colnames(df)) {
+      cols <- c(cols, 'cap')
+    }
+    if (object$logistic.floor) {
+      cols <- c(cols, 'floor')
+    }
+    df <- df[cols]
     df <- df %>%
       dplyr::bind_cols(seasonal.components) %>%
       dplyr::bind_cols(intervals)
   }else{
+    # Drop columns except ds, cap, floor, and trend
+    cols <- c('ds', 'trend')
+    if ('cap' %in% colnames(df)) {
+      cols <- c(cols, 'cap')
+    }
+    if (object$logistic.floor) {
+      cols <- c(cols, 'floor')
+    }
+    df <- df[cols]
     df <- df %>%
       dplyr::bind_cols(seasonal.components)
   }
@@ -1363,7 +1372,6 @@ sample_predictive_trend <- function(model, df, iteration) {
     cap <- df$cap_scaled
     trend <- piecewise_logistic(t, cap, deltas, k, param.m, changepoint.ts)
   }
-  if (is.null(df$floor)) df$floor <- 0
   return(trend * model$y.scale + df$floor)
 }
 
