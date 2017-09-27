@@ -25,6 +25,12 @@ Prophet is a [CRAN package](https://cran.r-project.org/package=prophet) so you c
 > install.packages('prophet')
 ```
 
+In this branch, you can install by this code:
+```
+# R
+> devtools::install_github("xinai57/prophet/R", ref = "sto")
+```
+
 After installation, you can [get started!](https://facebookincubator.github.io/prophet/docs/quick_start.html#r-api)
 
 ### Windows
