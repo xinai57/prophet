@@ -1363,6 +1363,7 @@ sample_predictive_trend <- function(model, df, iteration) {
     cap <- df$cap_scaled
     trend <- piecewise_logistic(t, cap, deltas, k, param.m, changepoint.ts)
   }
+  if (is.null(df$floor)) df$floor <- 0
   return(trend * model$y.scale + df$floor)
 }
 
